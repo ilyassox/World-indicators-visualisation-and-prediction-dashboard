@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ country_name }} Information</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://kit.fontawesome.com/37d6505749.js" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: rgb(39, 44, 67);
+            color: #f2f2f2;
+        }
+
+        nav {
+            background-color: #333;
+            width: 250px;
+            min-height: 100vh;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        nav .logo {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        nav .logo img {
+            max-width: 40px;
+            margin-right: 10px;
+        }
+
+        nav .logo a {
+            color: #f2f2f2;
+            font-size: 24px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            width: 100%;
+        }
+
+        nav ul li {
+            margin: 20px 0;
+        }
+
+        nav ul li a {
+            color: #f2f2f2;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            background-color: #444;
+        }
+
+        nav ul li a i {
+            margin-right: 10px;
+        }
+
+        main {
+            margin-left: 270px; /* width of the sidebar + padding */
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        h1 {
+            padding: 10px 0;
+        }
+
+        .main-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-inner {
+            margin-bottom: 10px;
+        }
+
+        .text-primary {
+            color: #333;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .font-weight-bold {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        /* Custom styles for checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-container label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: rgb(39, 44, 67);
+            border: 2px solid #cc3333;
+            border-radius: 4px;
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .checkbox-container input[type="checkbox"]:checked::before {
+            content: '\2713';
+            display: block;
+            color: white;
+            font-size: 12px;
+            line-height: 16px;
+            text-align: center;
+        }
+    </style>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='Untitled.png') }}">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <img src="{{country_pic}}" alt="Flag">
+            <a href="{{ url_for('base', country_name=country_name) }}">{{country_name}} Indicators</a>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('socioeconomic', country_name=country_name) }}"><i class="fas fa-chart-line"></i> Socio-Economique</a></li>
+            <li><a href="{{ url_for('health', country_name=country_name) }}"><i class="fas fa-heartbeat"></i> Health</a></li>
+            <li><a href="{{ url_for('infra', country_name=country_name) }}"><i class="fas fa-building"></i> Infrastructure</a></li>
+            <li><a href="{{ url_for('climatique', country_name=country_name) }}"><i class="fas fa-cloud-sun"></i> Climatique</a></li>
+            <li><a href="{{ url_for('index')}}"><i class="fas fa-map"></i> Return Map</a></li>
+        </ul>
+    </nav>
+    <main>
+        {% if graph_internet %}
+            <h1>Infrastructure Analysis</h1>
+            <div id="internet-div"></div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="toggle-1-predictions" />
+                <label for="toggle-1-predictions">Show Next years predictions</label>
+            </div>
+            <div id="rail-div"></div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="toggle-2-predictions" />
+                <label for="toggle-2-predictions">Show Next years predictions</label>
+            </div>
+            <div id="air-div"></div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="toggle-3-predictions" />
+                <label for="toggle-3-predictions">Show Next years predictions</label>
+            </div>
+            <script>
+            var graph_internet = JSON.parse('{{ graph_internet | safe }}');
+        
+            // Ensure the layout object exists
+            if (!graph_internet.layout) {
+                graph_internet.layout = {};
+            }
+        
+            // Set the background colors to the desired color
+            var darkBlueColor = 'rgb(39, 44, 67)';
+            graph_internet.layout.paper_bgcolor = darkBlueColor;
+            graph_internet.layout.plot_bgcolor = darkBlueColor;
+            graph_internet.layout.font = { color: 'white' };
+        
+            // Explicitly set visibility of traces to ensure the prediction trace is hidden
+            graph_internet.data.forEach(function(trace, index) {
+                if (index === 1) {  // Assuming the predictions trace is the second trace (index 1)
+                    trace.visible = false;
+                }
+            });
+        
+            Plotly.react('internet-div', graph_internet.data, graph_internet.layout);
+        
+            document.getElementById('toggle-1-predictions').addEventListener('change', function() {
+                var visible = this.checked ? true : false;
+                Plotly.restyle('internet-div', { visible: visible }, [1]);  // Toggle the visibility of the second trace (index 1)
+            });
+        </script>
+            <script>
+                var graph_rail = JSON.parse('{{ graph_rail | safe }}');
+            
+                // Ensure the layout object exists
+                if (!graph_rail.layout) {
+                    graph_rail.layout = {};
+                }
+            
+                // Set the background colors to the desired color
+                var darkBlueColor = 'rgb(39, 44, 67)';
+                graph_rail.layout.paper_bgcolor = darkBlueColor;
+                graph_rail.layout.plot_bgcolor = darkBlueColor;
+                graph_rail.layout.font = { color: 'white' };
+            
+                // Explicitly set visibility of traces to ensure the prediction trace is hidden
+                graph_rail.data.forEach(function(trace, index) {
+                    if (index === 1) {  // Assuming the predictions trace is the second trace (index 1)
+                        trace.visible = false;
+                    }
+                });
+            
+                Plotly.react('rail-div', graph_rail.data, graph_rail.layout);
+            
+                document.getElementById('toggle-2-predictions').addEventListener('change', function() {
+                    var visible = this.checked ? true : false;
+                    Plotly.restyle('rail-div', { visible: visible }, [1]);  // Toggle the visibility of the second trace (index 1)
+                });
+            </script>
+            
+            <script>
+                var graph_air = JSON.parse('{{ trans_graph_air | safe }}');
+            
+                // Ensure the layout object exists
+                if (!graph_air.layout) {
+                    graph_air.layout = {};
+                }
+            
+                // Set the background colors to the desired color
+                var darkBlueColor = 'rgb(39, 44, 67)';
+                graph_air.layout.paper_bgcolor = darkBlueColor;
+                graph_air.layout.plot_bgcolor = darkBlueColor;
+                graph_air.layout.font = { color: 'white' };
+            
+                // Explicitly set visibility of traces to ensure the prediction trace is hidden
+                graph_air.data.forEach(function(trace, index) {
+                    if (index === 1) {  // Assuming the predictions trace is the second trace (index 1)
+                        trace.visible = false;
+                    }
+                });
+            
+                Plotly.react('air-div', graph_air.data, graph_air.layout);
+            
+                document.getElementById('toggle-3-predictions').addEventListener('change', function() {
+                    var visible = this.checked ? true : false;
+                    Plotly.restyle('air-div', { visible: visible }, [1]);  // Toggle the visibility of the second trace (index 1)
+                });
+            </script>
+            
+        {% else %}
+            <p>No data available for {{ country_name }}</p>
+        {% endif %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ country_name }} Informations</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://kit.fontawesome.com/37d6505749.js" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: rgb(39, 44, 67);
+            color: #f2f2f2;
+        }
+
+        nav {
+            background-color: #333;
+            width: 250px;
+            min-height: 100vh;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        nav .logo {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        nav .logo img {
+            max-width: 40px;
+            margin-right: 10px;
+        }
+
+        nav .logo a {
+            color: #f2f2f2;
+            font-size: 24px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            width: 100%;
+        }
+
+        nav ul li {
+            margin: 20px 0;
+        }
+
+        nav ul li a {
+            color: #f2f2f2;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            background-color: #444;
+        }
+
+        nav ul li a i {
+            margin-right: 10px;
+        }
+
+        main {
+            margin-left: 270px; /* width of the sidebar + padding */
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        h1 {
+            padding: 10px 0;
+        }
+
+        /* Custom styles for checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-container label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: rgb(39, 44, 67);
+            border: 2px solid #cc3333;
+            border-radius: 4px;
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .checkbox-container input[type="checkbox"]:checked::before {
+            content: '\2713';
+            display: block;
+            color: white;
+            font-size: 12px;
+            line-height: 16px;
+            text-align: center;
+        }
+        label {
+            margin-left: 10px;
+            color: #f2f2f2;
+            font-size: 18px;
+        }
+    </style>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='Untitled.png') }}">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <img src="{{country_pic}}" alt="Flag">
+            <a href="{{ url_for('base', country_name=country_name) }}">{{country_name}} Indicators</a>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('socioeconomic', country_name=country_name) }}"><i class="fas fa-chart-line"></i> Socio-Economique</a></li>
+            <li><a href="{{ url_for('health', country_name=country_name) }}"><i class="fas fa-heartbeat"></i> Health</a></li>
+            <li><a href="{{ url_for('infra', country_name=country_name) }}"><i class="fas fa-building"></i> Infrastructure</a></li>
+            <li><a href="{{ url_for('climatique', country_name=country_name) }}"><i class="fas fa-cloud-sun"></i> Climatique</a></li>
+            <li><a href="{{ url_for('index')}}"><i class="fas fa-map"></i> Return Map</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h1>{{ country_name }} Health Informations</h1>
+        
+        <h1>Health Analysis</h1>
+        <div id="fertility-div"></div>
+        <div class="checkbox-container">
+            <input type="checkbox" id="toggle-1-predictions" />
+            <label for="toggle-1-predictions">Show Next years predictions</label>
+        </div>
+        <div id="life-div"></div>
+        <div class="checkbox-container">
+            <input type="checkbox" id="toggle-2-predictions" />
+            <label for="toggle-2-predictions">Show Next years predictions</label>
+        </div>
+        <div id="death-div"></div>
+        <div class="checkbox-container">
+            <input type="checkbox" id="toggle-3-predictions" />
+            <label for="toggle-3-predictions">Show Next years predictions</label>
+        </div>
+        <div id="fm-div"></div>
+        <script>
+            var graph_fer = JSON.parse('{{ graph_fer | safe }}');
+        
+            // Ensure the layout object exists
+            if (!graph_fer.layout) {
+                graph_fer.layout = {};
+            }
+        
+            // Set the background colors to the desired color
+            var darkBlueColor = 'rgb(39, 44, 67)';
+            graph_fer.layout.paper_bgcolor = darkBlueColor;
+            graph_fer.layout.plot_bgcolor = darkBlueColor;
+            graph_fer.layout.font = { color: 'white' };
+        
+            // Explicitly set visibility of traces to ensure the prediction trace is hidden
+            graph_fer.data.forEach(function(trace, index) {
+                if (index === 1) {  // Assuming the predictions trace is the second trace (index 1)
+                    trace.visible = false;
+                }
+            });
+        
+            Plotly.react('fertility-div', graph_fer.data, graph_fer.layout);
+        
+            document.getElementById('toggle-1-predictions').addEventListener('change', function() {
+                var visible = this.checked ? true : false;
+                Plotly.restyle('fertility-div', { visible: visible }, [1]);  // Toggle the visibility of the second trace (index 1)
+            });
+        </script>
+        <script>
+            var graph_life = JSON.parse('{{ graph_life | safe }}');
+        
+            // Ensure the layout object exists
+            if (!graph_life.layout) {
+                graph_life.layout = {};
+            }
+        
+            // Set the background colors to the desired color
+            var darkBlueColor = 'rgb(39, 44, 67)';
+            graph_life.layout.paper_bgcolor = darkBlueColor;
+            graph_life.layout.plot_bgcolor = darkBlueColor;
+            graph_life.layout.font = { color: 'white' };
+        
+            // Explicitly set visibility of traces to ensure the prediction trace is hidden
+            graph_life.data.forEach(function(trace, index) {
+                if (index === 1) {  // Assuming the predictions trace is the second trace (index 1)
+                    trace.visible = false;
+                }
+            });
+        
+            Plotly.react('life-div', graph_life.data, graph_life.layout);
+        
+            document.getElementById('toggle-2-predictions').addEventListener('change', function() {
+                var visible = this.checked ? true : false;
+                Plotly.restyle('life-div', { visible: visible }, [1]);  // Toggle the visibility of the second trace (index 1)
+            });
+        </script>
+        <script>
+            var graph_death = JSON.parse('{{ graph_death | safe }}');
+        
+            // Ensure the layout object exists
+            if (!graph_death.layout) {
+                graph_death.layout = {};
+            }
+        
+            // Set the background colors to the desired color
+            var darkBlueColor = 'rgb(39, 44, 67)';
+            graph_death.layout.paper_bgcolor = darkBlueColor;
+            graph_death.layout.plot_bgcolor = darkBlueColor;
+            graph_death.layout.font = { color: 'white' };
+        
+            // Explicitly set visibility of traces to ensure the prediction trace is hidden
+            graph_death.data.forEach(function(trace, index) {
+                if (index === 1) {  // Assuming the predictions trace is the second trace (index 1)
+                    trace.visible = false;
+                }
+            });
+        
+            Plotly.react('death-div', graph_death.data, graph_death.layout);
+        
+            document.getElementById('toggle-3-predictions').addEventListener('change', function() {
+                var visible = this.checked ? true : false;
+                Plotly.restyle('death-div', { visible: visible }, [1]);  // Toggle the visibility of the second trace (index 1)
+            });
+        </script>
+        <script>
+            var fmData = JSON.parse('{{ graph_pie | safe }}');
+            
+            if (!fmData.layout) {
+                fmData.layout = {};
+            }
+        
+            var darkBlueColor = 'rgb(39, 44, 67)';
+            fmData.layout.paper_bgcolor = darkBlueColor;
+            fmData.layout.plot_bgcolor = darkBlueColor;
+            fmData.layout.font = { color: 'white' };
+            
+            Plotly.react('fm-div', fmData.data, fmData.layout);
+        </script>
+        
+    </main>
+</body>
+</html>

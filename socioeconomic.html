@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ country_name }} Information</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://kit.fontawesome.com/37d6505749.js" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: rgb(39, 44, 67);
+            color: #f2f2f2;
+        }
+
+        nav {
+            background-color: #333;
+            width: 250px;
+            min-height: 100vh;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        nav .logo {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        nav .logo img {
+            max-width: 40px;
+            margin-right: 10px;
+        }
+
+        nav .logo a {
+            color: #f2f2f2;
+            font-size: 24px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            width: 100%;
+        }
+
+        nav ul li {
+            margin: 20px 0;
+        }
+
+        nav ul li a {
+            color: #f2f2f2;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            background-color: #444;
+        }
+
+        nav ul li a i {
+            margin-right: 10px;
+        }
+
+        main {
+            margin-left: 270px; /* width of the sidebar + padding */
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        h1 {
+            padding: 10px 0;
+        }
+
+        .main-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-inner {
+            margin-bottom: 10px;
+        }
+
+        .text-primary {
+            color: #333;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .font-weight-bold {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        /* Custom styles for checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-container label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: rgb(39, 44, 67);
+            border: 2px solid #cc3333;
+            border-radius: 4px;
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .checkbox-container input[type="checkbox"]:checked::before {
+            content: '\2713';
+            display: block;
+            color: white;
+            font-size: 12px;
+            line-height: 16px;
+            text-align: center;
+        }
+
+        .flex-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .flex-item {
+            flex: 1;
+        }
+
+    </style>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='Untitled.png') }}">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <img src="{{country_pic}}" alt="Flag">
+            <a href="{{ url_for('base', country_name=country_name) }}">{{country_name}} Indicators</a>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('socioeconomic', country_name=country_name) }}"><i class="fas fa-chart-line"></i> Socio-Economique</a></li>
+            <li><a href="{{ url_for('health', country_name=country_name) }}"><i class="fas fa-heartbeat"></i> Health</a></li>
+            <li><a href="{{ url_for('infra', country_name=country_name) }}"><i class="fas fa-building"></i> Infrastructure</a></li>
+            <li><a href="{{ url_for('climatique', country_name=country_name) }}"><i class="fas fa-cloud-sun"></i> Climatique</a></li>
+            <li><a href="{{ url_for('index')}}"><i class="fas fa-map"></i> Return Map</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h1>Socio-Economic Related Cards</h1>
+        <br>
+        <div class="main-cards">
+
+            <div class="card">
+                <div class="card-inner">
+                    <p class="text-primary">Surface</p>
+                </div>
+                <span class="text-primary font-weight-bold">{{surface_area}}</span>
+            </div>
+
+            <div class="card">
+                <div class="card-inner">
+                    <p class="text-primary">GDP</p>
+                </div>
+                <span class="text-primary font-weight-bold">{{gdp}}</span>
+            </div>
+
+            <div class="card">
+                <div class="card-inner">
+                    <p class="text-primary">Employment industry</p>
+                </div>
+                <span class="text-primary font-weight-bold">{{employment_industry}}</span>
+            </div>
+
+        </div>
+
+        <h1>Socio-Economic Analysis</h1>
+
+        <div id="graph_population"></div>
+        <div class="checkbox-container">
+            <input type="checkbox" id="toggle-4-predictions" />
+            <label for="toggle-4-predictions">Show Next years predictions</label>
+        </div>
+
+        <div id="graph-div"></div>
+        <div class="checkbox-container">
+            <input type="checkbox" id="toggle-1-predictions" />
+            <label for="toggle-1-predictions">Show Next years predictions</label>
+        </div>
+        <div id="literacy-div"></div>
+        <div class="checkbox-container">
+            <input type="checkbox" id="toggle-2-predictions" />
+            <label for="toggle-2-predictions">Show Next years predictions</label>
+        </div>
+        <div id="unemployment-div"></div>
+        <div class="checkbox-container">
+            <input type="checkbox" id="toggle-3-predictions" />
+            <label for="toggle-3-predictions">Show Next years predictions</label>
+        </div>
+        <div id="employment-div"></div>
+        
+        <div id="gender-div"></div>
+        <div class="flex-container">
+            <div id="female-div" class="flex-item"></div>
+            <div id="male-div" class="flex-item"></div>
+        </div>
+
+        <script>
+            var graphData = JSON.parse('{{ graph_json_pop | safe }}');
+            var literacyData = JSON.parse('{{ graph_json_emi | safe }}');
+            var gdpData = JSON.parse('{{ graph_json_air | safe }}');
+            var emp = JSON.parse('{{ graph_pie | safe }}');
+            var emp1 = JSON.parse('{{ graph_gender | safe }}');
+            var emp2 = JSON.parse('{{ graph_female | safe }}');
+            var emp3 = JSON.parse('{{ graph_male | safe }}');
+            if (!graphData.layout) {
+                    graphData.layout = {};
+                }
+                if (!literacyData.layout) {
+                    literacyData.layout = {};
+                }
+                if (!gdpData.layout) {
+                    gdpData.layout = {};
+                }
+                if(!emp.layout){
+                    emp.layout={};
+                }
+                if(!emp1.layout){
+                    emp1.layout={};
+                }
+                if(!emp2.layout){
+                    emp2.layout={};
+                }
+                if(!emp3.layout){
+                    emp3.layout={};
+                }
+
+                var darkBlueColor = 'rgb(39, 44, 67)';
+                graphData.layout.paper_bgcolor = darkBlueColor;
+                graphData.layout.plot_bgcolor = darkBlueColor;
+                graphData.layout.font = { color: 'white' };
+                
+                literacyData.layout.paper_bgcolor = darkBlueColor;
+                literacyData.layout.plot_bgcolor = darkBlueColor;
+                literacyData.layout.font = { color: 'white' };
+                
+                gdpData.layout.paper_bgcolor = darkBlueColor;
+                gdpData.layout.plot_bgcolor = darkBlueColor;
+                gdpData.layout.font = { color: 'white' };
+
+                emp.layout.paper_bgcolor = darkBlueColor;
+                emp.layout.plot_bgcolor = darkBlueColor;
+                emp.layout.font = { color: 'white' };
+
+                emp1.layout.paper_bgcolor = darkBlueColor;
+                emp1.layout.plot_bgcolor = darkBlueColor;
+                emp1.layout.font = { color: 'white' };
+
+                emp2.layout.paper_bgcolor = darkBlueColor;
+                emp2.layout.plot_bgcolor = darkBlueColor;
+                emp2.layout.font = { color: 'white' };
+
+                emp3.layout.paper_bgcolor = darkBlueColor;
+                emp3.layout.plot_bgcolor = darkBlueColor;
+                emp3.layout.font = { color: 'white' };
+
+
+                // Explicitly set visibility of traces to ensure the prediction trace is hidden
+                graphData.data.forEach(function(trace, index) {
+                    if (index === 1) {  // Assuming the predictions trace is the second trace (index 1)
+                        trace.visible = false;
+                    }
+                });
+
+                literacyData.data.forEach(function(trace, index) {
+                    if (index === 1) {  // Assuming the predictions trace is the second trace (index 1)
+                        trace.visible = false;
+                    }
+                    trace.type = 'scatter';
+                    trace.mode = 'lines';
+                    if(index == 1){
+                        trace.line = { color: 'red' };
+                    }else{
+                        trace.line = { color: 'lightblue' };
+                    }
+                });
+
+                gdpData.data.forEach(function(trace, index) {
+                    if (index === 1) {  // Assuming the predictions trace is the second trace (index 1)
+                        trace.visible = false;
+                    }
+                    if (trace.name === 'Line Data') {
+                        trace.type = 'scatter';
+                        trace.mode = 'lines';
+                        trace.line = { color: 'lightblue' };
+                    } else if (trace.name === 'Histogram Data') {
+                        trace.type = 'histogram';
+                        trace.marker = { color: 'lightblue' };
+                    }
+                });
+
+                Plotly.react('graph-div', graphData.data, graphData.layout);
+                Plotly.react('literacy-div', literacyData.data, literacyData.layout);
+                Plotly.react('unemployment-div', gdpData.data, gdpData.layout);
+                Plotly.react('employment-div', emp.data, emp.layout);   
+                Plotly.react('gender-div', emp1.data, emp1.layout);
+                Plotly.react('female-div', emp2.data, emp2.layout);
+                Plotly.react('male-div', emp3.data, emp3.layout);
+
+                document.getElementById('toggle-1-predictions').addEventListener('change', function() {
+                    var visible = this.checked ? true : false;
+                    Plotly.restyle('graph-div', { visible: visible }, [1]);  // Toggle the visibility of the second trace (index 1)
+                });
+
+                document.getElementById('toggle-2-predictions').addEventListener('change', function() {
+                    var visible = this.checked ? true : false;
+                    Plotly.restyle('literacy-div', { visible: visible }, [1]);  // Toggle the visibility of the second trace (index 1)
+                });
+
+                document.getElementById('toggle-3-predictions').addEventListener('change', function() {
+                    var visible = this.checked ? true : false;
+                    Plotly.restyle('unemployment-div', { visible: visible }, [1]);  // Toggle the visibility of the second trace (index 1)
+                });
+        </script>
+        <script>
+            var graph_populations = JSON.parse('{{ graph_population | safe }}');
+        
+            // Ensure the layout object exists
+            if (!graph_populations.layout) {
+                graph_populations.layout = {};
+            }
+        
+            // Set the background colors to the desired color
+            var darkBlueColor = 'rgb(39, 44, 67)';
+            graph_populations.layout.paper_bgcolor = darkBlueColor;
+            graph_populations.layout.plot_bgcolor = darkBlueColor;
+            graph_populations.layout.font = { color: 'white' };
+        
+            // Explicitly set visibility of traces to ensure the prediction trace is hidden
+            graph_populations.data.forEach(function(trace, index) {
+                if (index === 1) {  // Assuming the predictions trace is the second trace (index 1)
+                    trace.visible = false;
+                }
+            });
+        
+            Plotly.react('graph_population', graph_populations.data, graph_populations.layout);
+        
+            document.getElementById('toggle-4-predictions').addEventListener('change', function() {
+                var visible = this.checked ? true : false;
+                Plotly.restyle('graph_population', { visible: visible }, [1]);  // Toggle the visibility of the second trace (index 1)
+            });
+        </script>
+        
+    </main>
+</body>
+</html>
